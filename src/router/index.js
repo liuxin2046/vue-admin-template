@@ -54,7 +54,6 @@ export const constantRoutes = [
       meta: { title: 'Dashboard', icon: 'dashboard' }
     }]
   },
-
   {
     path: '/example',
     component: Layout,
@@ -164,7 +163,29 @@ export const asyncRoutes = [
       }
     ]
   },
-
+  {
+    path: '/seting',
+    component: Layout,
+    redirect: '/permission/role',
+    alwaysShow: true,
+    name: '系统设置',
+    meta: {
+      title: '系统设置',
+      icon: 'lock',
+      roles: ['admin', 'editor']
+    },
+    children: [
+      {
+        path: 'role',
+        component: () => import('@/views/permission/role'),
+        name: '角色管理',
+        meta: {
+          title: '角色管理',
+          roles: ['admin'] // or you can only set roles in sub nav
+        }
+      }
+    ]
+  },
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }
 ]
