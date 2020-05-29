@@ -96,91 +96,76 @@ export const constantRoutes = [
  */
 export const asyncRoutes = [
   {
-    path: '/nested',
+    path: '/menu1',
     component: Layout,
-    redirect: '/nested/menu1',
-    name: 'Nested',
-    meta: {
-      title: 'Nested',
-      icon: 'nested'
-    },
+    name: 'Menu1',
+    meta: { title: '唱片管理', icon: 'nested' },
     children: [
       {
-        path: 'menu1',
-        component: () => import('@/views/nested/menu1/index'), // Parent router-view
-        name: 'Menu1',
-        meta: { title: 'Menu1' },
-        children: [
-          {
-            path: 'menu1-1',
-            component: () => import('@/views/nested/menu1/menu1-1'),
-            name: 'Menu1-1',
-            meta: { title: 'Menu1-1' }
-          },
-          {
-            path: 'menu1-2',
-            component: () => import('@/views/nested/menu1/menu1-2'),
-            name: 'Menu1-2',
-            meta: { title: 'Menu1-2' },
-            children: [
-              {
-                path: 'menu1-2-1',
-                component: () => import('@/views/nested/menu1/menu1-2/menu1-2-1'),
-                name: 'Menu1-2-1',
-                meta: { title: 'Menu1-2-1' }
-              },
-              {
-                path: 'menu1-2-2',
-                component: () => import('@/views/nested/menu1/menu1-2/menu1-2-2'),
-                name: 'Menu1-2-2',
-                meta: { title: 'Menu1-2-2' }
-              }
-            ]
-          },
-          {
-            path: 'menu1-3',
-            component: () => import('@/views/nested/menu1/menu1-3'),
-            name: 'Menu1-3',
-            meta: { title: 'Menu1-3' }
-          }
-        ]
+        path: 'menu1-1',
+        component: () => import('@/views/nested/menu1/menu1-1'),
+        name: 'Menu1-1',
+        meta: { title: '查看唱片', privileges: ['READ_RELEASE'] }
       },
       {
-        path: 'menu2',
-        component: () => import('@/views/nested/menu2/index'),
-        meta: { title: 'menu2' }
+        path: 'menu1-3',
+        component: () => import('@/views/nested/menu1/menu1-3'),
+        name: 'Menu1-3',
+        meta: { title: '创建唱片', privileges: ['CREATE_RELEASE'] }
       }
     ]
   },
-
   {
-    path: 'external-link',
+    path: '/analysis',
     component: Layout,
     children: [
       {
-        path: 'https://panjiachen.github.io/vue-element-admin-site/#/',
-        meta: { title: 'External Link', icon: 'link' }
+        path: 'index',
+        name: 'Form',
+        component: () => import('@/views/nested/menu2/index'),
+        meta: { title: '数据分析', icon: 'nested', privileges: ['MANAGE_ANALYSIS'] }
+      }
+    ]
+  },
+  {
+    path: '/shop',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        name: 'shopList',
+        component: () => import('@/views/shop/shopList'),
+        meta: { title: '商品列表', icon: 'nested' }
       }
     ]
   },
   {
     path: '/seting',
     component: Layout,
-    redirect: '/permission/role',
+    redirect: '/seting/role',
     alwaysShow: true,
-    name: '系统设置',
+    name: 'seting',
     meta: {
       title: '系统设置',
-      icon: 'lock',
-      roles: ['admin', 'editor']
+      icon: 'nested'
     },
     children: [
       {
         path: 'role',
         component: () => import('@/views/permission/role'),
-        name: '角色管理',
+        name: 'role',
         meta: {
           title: '角色管理',
+          roles: ['admin'] // or you can only set roles in sub nav
+        }
+      },
+      {
+        path: 'roleEdit/:id?',
+        component: () => import('@/views/permission/editRole'),
+        name: 'roleEdit',
+        hidden: true,
+        meta: {
+          title: '角色编辑',
           roles: ['admin'] // or you can only set roles in sub nav
         }
       }

@@ -1,4 +1,5 @@
 import { login, logout, getInfo } from '@/api/user'
+import { getUserPrivilege } from '@/api/role'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import { resetRouter } from '@/router'
 
@@ -7,7 +8,8 @@ const getDefaultState = () => {
     token: getToken(),
     name: '',
     avatar: '',
-    roles: []
+    roles: [],
+    privilege: []
   }
 }
 
@@ -28,6 +30,9 @@ const mutations = {
   },
   SET_ROLES: (state, roles) => {
     state.roles = roles
+  },
+  SET_PRIVILEGE: (state, privilege) => {
+    state.privilege = privilege
   }
 }
 
@@ -73,7 +78,20 @@ const actions = {
       })
     })
   },
-
+  // get user privilege
+  getUserPrivilege({ commit }) {
+    return new Promise((resolve, reject) => {
+      getUserPrivilege().then(res => {
+        const { data } = res
+        const privilege = []
+        data.forEach(v => { privilege.push(v.name) })
+        commit('SET_PRIVILEGE', privilege)
+        resolve(privilege)
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
   // user logout
   logout({ commit, state }) {
     return new Promise((resolve, reject) => {
