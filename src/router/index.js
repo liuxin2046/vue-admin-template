@@ -62,6 +62,12 @@ export const constantRoutes = [
     meta: { title: 'Example', icon: 'example' },
     children: [
       {
+        path: 'banner',
+        name: 'Banner',
+        component: () => import('@/views/banner/bannerEdit'),
+        meta: { title: 'banner', icon: 'table' }
+      },
+      {
         path: 'table',
         name: 'Table',
         component: () => import('@/views/table/index'),

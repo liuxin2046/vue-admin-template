@@ -1,8 +1,8 @@
-import request from '@/utils/request'
+import { host, request } from '@/utils/request'
 
 export function login(data) {
   return request({
-    url: '/user/login',
+    url: `${host}/user/login`,
     method: 'post',
     data
   })
@@ -10,7 +10,7 @@ export function login(data) {
 
 export function getInfo(token) {
   return request({
-    url: '/user/info',
+    url: `${host}/user/info`,
     method: 'get',
     params: { token }
   })
@@ -18,7 +18,7 @@ export function getInfo(token) {
 
 export function getPrivilege(token) {
   return request({
-    url: '/user/privilege',
+    url: `${host}/user/privilege`,
     method: 'get',
     params: { token }
   })
@@ -26,7 +26,7 @@ export function getPrivilege(token) {
 
 export function logout() {
   return request({
-    url: '/user/logout',
+    url: `${host}/user/logout`,
     method: 'post'
   })
 }

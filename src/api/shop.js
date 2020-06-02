@@ -1,8 +1,8 @@
-import request from '@/utils/request'
+import { host, request } from '@/utils/request'
 
 export function getList(params) {
   return request({
-    url: '/user/shop',
+    url: `${host}/user/shop`,
     method: 'get',
     params
   })
@@ -10,7 +10,7 @@ export function getList(params) {
 
 export function shelves(params) {
   return request({
-    url: '/user/shop',
+    url: `${host}/user/shop`,
     method: 'get',
     params
   })
@@ -18,7 +18,7 @@ export function shelves(params) {
 
 export function takeOff(params) {
   return request({
-    url: '/user/shop',
+    url: `${host}/user/shop`,
     method: 'get',
     params
   })
@@ -26,7 +26,7 @@ export function takeOff(params) {
 
 export function deleteProduct(params) {
   return request({
-    url: '/user/shop',
+    url: `${host}/user/shop`,
     method: 'get',
     params
   })
@@ -34,7 +34,13 @@ export function deleteProduct(params) {
 
 export function getWork() {
   return request({
-    url: '/api/v0/work',
+    url: `${host}/api/v0/work`,
     method: 'get'
+  })
+}
+
+export function getBanners(id) {
+  return request({
+    url: `http://10.0.0.11:8082/api/admin/carousel/${id}`
   })
 }

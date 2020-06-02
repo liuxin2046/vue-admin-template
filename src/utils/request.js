@@ -1,17 +1,18 @@
 import axios from 'axios'
 import { MessageBox, Message } from 'element-ui'
 import store from '@/store'
-import { getToken } from '@/utils/auth'
+import { getTokenType, getToken } from '@/utils/auth'
 
+const host = process.env.VUE_APP_BASE_API
 // create an axios instance
-const service = axios.create({
-  baseURL: process.env.VUE_APP_BASE_API, // url = base url + request url
+const request = axios.create({
+  // baseURL: process.env.VUE_APP_BASE_API, // url = base url + request url
   // withCredentials: true, // send cookies when cross-domain requests
   timeout: 5000 // request timeout
 })
 
 // request interceptor
-service.interceptors.request.use(
+request.interceptors.request.use(
   config => {
     // do something before request is sent
 
@@ -19,7 +20,7 @@ service.interceptors.request.use(
       // let each request carry token
       // ['X-Token'] is a custom headers key
       // please modify it according to the actual situation
-      config.headers['token'] = getToken()
+      config.headers['Authorization'] = getTokenType() + getToken()
     }
     return config
   },
@@ -31,7 +32,7 @@ service.interceptors.request.use(
 )
 
 // response interceptor
-service.interceptors.response.use(
+request.interceptors.response.use(
   /**
    * If you want to get http information such as headers or status
    * Please return  response => response
@@ -43,42 +44,56 @@ service.interceptors.response.use(
    * You can also judge the status by HTTP Status Code
    */
   response => {
-    const res = response.data
-    console.log('response: ', res)
-    // if the custom code is not 20000, it is judged as an error.
-    if (res.code !== 200) {
-      Message({
-        message: res.message || 'Error',
-        type: 'error',
-        duration: 5 * 1000
-      })
-      // 50008: Illegal token; 50012: Other clients logged in; 50014: Token expired;
-      if (res.code === 50008 || res.code === 50012 || res.code === 50014) {
-        // to re-login
-        MessageBox.confirm('You have been logged out, you can cancel to stay on this page, or log in again', 'Confirm logout', {
-          confirmButtonText: 'Re-Login',
-          cancelButtonText: 'Cancel',
-          type: 'warning'
-        }).then(() => {
-          store.dispatch('user/resetToken').then(() => {
-            location.reload()
-          })
-        })
-      }
-      return Promise.reject(new Error(res.message || 'Error'))
+    if (response.status === 200) {
+      return Promise.resolve(response.data)
     } else {
-      return res
+      return Promise.reject(response)
     }
   },
   error => {
-    console.log('err' + error) // for debug
-    Message({
-      message: error.message,
-      type: 'error',
-      duration: 5 * 1000
-    })
-    return Promise.reject(error)
+    if (error && error.response) {
+      const status = error.response.status
+      // const data = error.response.data
+      // coustom error code
+      // const code = data.code
+      if (status === 401) {
+        MessageBox.confirm(
+          '你已被登出，可以取消继续留在该页面，或者重新登录',
+          '确定登出',
+          {
+            confirmButtonText: '重新登录',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }
+        ).then(() => {
+          store.dispatch('user/logout').then(() => {
+            location.reload() // 为了重新实例化vue-router对象 避免bug
+          })
+        })
+      }
+      if (status === 500) {
+        Message({
+          message: '系统错误,请联系管理员处理',
+          type: 'error',
+          duration: 5 * 1000
+        })
+      } else {
+        Message({
+          message: error.message,
+          type: 'error',
+          duration: 5 * 1000
+        })
+      }
+      return Promise.reject(error)
+    } else {
+      Message({
+        message: '请求失败，请稍后重试',
+        type: 'error',
+        duration: 5 * 1000
+      })
+      return Promise.reject(error)
+    }
   }
 )
 
-export default service
+export { host, request }
