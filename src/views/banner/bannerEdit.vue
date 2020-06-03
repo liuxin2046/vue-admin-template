@@ -1,18 +1,18 @@
 <template>
   <div class="app-container">
     <el-form ref="form" :model="form" :rules="validate" label-width="70px" size="small" class="allForm">
-      <el-form-item label="轮播图" label-width="90px" prop="image">
+      <el-form-item label="图片上传" label-width="90px" prop="image">
         <el-col>
-          <upload
-            :remove-callback="uploadRemove"
-            :success-callback="uploadSuccess"
-            :allow-file-type="['image/png', 'image/jpeg']"
-            :headers="upload.headers"
-            :file-list="upload.fileList"
-            :action="upload.action"
-            :limit="1"
-          />
-          <span class="tips">建议尺寸为750x1206px, 图片格式支持 jpg / png </span>
+          <image-upload v-model="form.image" :remove-callback="uploadRemove" :success-callback="uploadSuccess" :headers="upload.headers" :action="upload.action" />
+          <div class="tips">建议尺寸为750x1206px, 图片格式支持 jpg / png </div>
+          <el-button type="primary" @click="saveForm">保存图片</el-button>
+        </el-col>
+      </el-form-item>
+      <el-form-item label="视频上传" label-width="90px" prop="image">
+        <el-col>
+          <image-upload v-model="form.image" :remove-callback="uploadRemove" :success-callback="uploadSuccess" :headers="upload.headers" :action="upload.action" />
+          <div class="tips">建议尺寸为750x1206px, 图片格式支持 jpg / png </div>
+          <el-button type="primary" @click="saveForm">保存视频</el-button>
         </el-col>
       </el-form-item>
     </el-form>
@@ -22,7 +22,7 @@
 <script>
 // import $api from '@/network/loginSet'
 import { getBanners } from '@/api/shop'
-import upload from '@/components/ImageUpload'
+import ImageUpload from '@/components/ImageUpload'
 // import { host } from '@/utils/request'
 // import user from '@/network/user'
 
@@ -31,7 +31,7 @@ import { getTokenType, getToken } from '@/utils/auth'
 // const ERR_OK = 200
 export default {
   components: {
-    upload
+    ImageUpload
   },
   data() {
     return {
@@ -75,9 +75,6 @@ export default {
         const { id, title } = data.article
         this.articleList.push({ id, title })
         this.form.article = id
-        Array.isArray(data.image) && data.image.forEach((url, idx) => {
-          this.upload.fileList.push({ name: new Date().getTime() + idx, url })
-        })
       }
     })
     const index = this.$route.params.number
@@ -98,29 +95,14 @@ export default {
         this.articleList = []
       }
     },
-    uploadRemove({ file }) {
-      const url = file.response ? file.response.data : file.url
-      this.form = Object.assign({}, this.form, {
-        image: this.form.image.filter(item => item !== url)
-      })
+    uploadRemove(images) {
+      // console.log('images: ', images)
     },
-    uploadSuccess({ response: { data }}) {
-      this.form.image.push(data)
+    uploadSuccess(images) {
+      // console.log('images: ', images)
     },
     saveForm() {
-      // this.$refs.form.validate().then((valid) => {
-      //   if (!valid) return
-      //   // this.loading = true
-      //   const { id } = this.$route.params
-      //   $api.postSlide({ id: id, ...this.form }).then(({ status }) => {
-      //     if (status === ERR_OK) {
-      //       this.$message({ message: '保存成功', type: 'success' })
-      //       this.$router.back()
-      //     } else {
-      //       this.$message({ message: '保存失败', type: 'error' })
-      //     }
-      //   })
-      // })
+      console.log('form: ', this.form)
     },
     cancelBtn() {
       this.$router.back()

@@ -57,7 +57,7 @@ export const constantRoutes = [
   {
     path: '/example',
     component: Layout,
-    redirect: '/example/table',
+    redirect: '/example/banner',
     name: 'Example',
     meta: { title: 'Example', icon: 'example' },
     children: [
@@ -65,7 +65,13 @@ export const constantRoutes = [
         path: 'banner',
         name: 'Banner',
         component: () => import('@/views/banner/bannerEdit'),
-        meta: { title: 'banner', icon: 'table' }
+        meta: { title: '图片上传', icon: 'table' }
+      },
+      {
+        path: 'righText',
+        name: 'RighText',
+        component: () => import('@/views/richText/index'),
+        meta: { title: '富文本', icon: 'table' }
       },
       {
         path: 'table',

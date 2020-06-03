@@ -54,11 +54,11 @@
 <script>
 import vuedraggable from 'vuedraggable'
 // import { getToken } from '@/utils/auth' // 获取token，用于后端接口登录校验，根据公司的业务自行移除或替换就行
-import { validImgUpload } from '@/utils/validate'
+// import { validImgUpload } from '@/utils/validate'
 // import lrz from 'lrz' // 前端图片压缩插件
 import { createUniqueString, compressedImage } from '@/utils/tools'
 export default {
-  name: 'ImgUpload',
+  name: 'VideoUpload',
   components: { vuedraggable },
   props: {
     // 图片数据(图片url组成的数组) 通过v-model传递
@@ -86,7 +86,7 @@ export default {
     // 限制上传图片的文件大小(kb)
     size: {
       type: Number,
-      default: 25600
+      default: 10240
     },
     // 是否是单图上传(单图上传就是已传图片和上传按钮重叠)
     isSingle: {
@@ -115,7 +115,7 @@ export default {
     accept: {
       type: String,
       default() {
-        return '.png,.jpg,.jpeg'
+        return '.avi,.mp4,.mkv,.mov'
       }
     },
     successCallback: {
@@ -200,9 +200,9 @@ export default {
     // 上传图片之前
     beforeUpload(file) {
       this.isFirstMount = false
-      // this.isUploading = true
-      // console.log('file: ', file)
-      // return true
+      this.isUploading = true
+      console.log('file: ', file)
+      return true
       // if (this.useCompress) {
       //   // 图片压缩
       //   return new Promise((resolve, reject) => {
@@ -225,12 +225,6 @@ export default {
       //     return false
       //   }
       // }
-      if (validImgUpload(file, this.size)) {
-        this.isUploading = true
-        return true
-      } else {
-        return false
-      }
     },
     // 上传完单张图片
     onSuccessUpload(res, file, fileList) {
@@ -393,4 +387,3 @@ export default {
   }
 }
 </style>
-

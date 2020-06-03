@@ -12,6 +12,7 @@ export function formatImage(url, type = 'cover') {
     return hasSlash ? host + url + `?x-oss-process=style/${type}` : host + '/' + url + `?x-oss-process=style/${type}`
   }
 }
+
 export function formatMediaPath(url) {
   const host = 'https://media.musicbible.com'
   const isComplete = url.startsWith('http')
