@@ -30,7 +30,6 @@
 
 <script>
 import { getRoles, deleteRole } from '@/api/role'
-import dayjs from 'dayjs'
 const defaultRole = {
   key: '',
   name: '',
@@ -60,7 +59,7 @@ export default {
   },
   methods: {
     formatTime(time) {
-      return time ? dayjs(time).format('YYYY年MM月DD HH:mm:ss') : '-'
+      return time ? this.$dayjs(time).format('YYYY年MM月DD HH:mm:ss') : '-'
     },
     async getRoles() {
       const res = await getRoles()

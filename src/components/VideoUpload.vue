@@ -1,26 +1,35 @@
 <template>
   <div v-show="visible" class="uploadWrapper">
     <vuedraggable
-      v-model="imgList"
+      v-model="videoList"
       class="vue-draggable"
       :class="{ single: isSingle, maxHidden: isMaxHidden }"
       tag="ul"
-      draggable=".draggable-item"
+      draggable=".draggable-items"
       @start="onDragStart"
       @end="onDragEnd"
     >
-      <!-- 拖拽元素 -->
-      <li
-        v-for="(item, index) in imgList"
-        :key="item + index"
-        class="draggable-item"
-        :style="{ width: width + 'px', height: height + 'px' }"
+      <div
+        v-for="(item, index) in videoList"
+        :key="item.url + index"
+        class="draggable-items"
       >
-        <img :src="compressedImage(item)" :width="width" :height="height" @click="handlePreview(item)">
-        <div class="shadow" @click="onRemoveHandler(index)">
-          <i class="el-icon-delete" />
-        </div>
-      </li>
+        <!-- 拖拽元素 -->
+        <li
+          class="draggable-item"
+          :style="{ width: width + 'px', height: height + 'px' }"
+        >
+          <div class="play-icon" @click="handlePreview(item)">
+            <i class="el-icon-video-play" />
+          </div>
+          <!-- <img :src="item" :width="width" :height="height" @click="handlePreview(item)"> -->
+          <video :src="item.url" :width="width" :height="height" @click="handlePreview(item)" />
+          <div class="shadow" @click="onRemoveHandler(index)">
+            <i class="el-icon-delete" />
+          </div>
+        </li>
+        <div class="file-name">{{ item.title }}</div>
+      </div>
       <!-- 上传按钮 -->
       <el-upload
         ref="uploadRef"
@@ -41,12 +50,12 @@
           <span
             v-if="!isUploading && limit && limit!==99 && !isSingle"
             class="limitTxt"
-          >最多{{ limit }}张</span>
+          >最多{{ limit }}个</span>
         </i>
       </el-upload>
     </vuedraggable>
-    <el-dialog :visible.sync="dialog" width="40%" @closed="modalClose">
-      <img width="100%" :src="dialogImageUrl">
+    <el-dialog :visible.sync="dialog" width="60%" @closed="modalClose">
+      <video width="100%" height="500px" :src="videoUrl" controls="controls">您的浏览器暂不支持在线播放，请更新！</video>
     </el-dialog>
   </div>
 </template>
@@ -135,7 +144,8 @@ export default {
   data() {
     return {
       dialog: false,
-      dialogImageUrl: '',
+      fileName: '',
+      videoUrl: '',
       // headers: { token: getToken() },
       isUploading: false, // 正在上传状态
       isFirstMount: true // 控制防止重复回显
@@ -144,12 +154,12 @@ export default {
 
   computed: {
     // 图片数组数据
-    imgList: {
+    videoList: {
       get() {
         return this.value
       },
       set(val) {
-        if (val.length < this.imgList.length) {
+        if (val.length < this.videoList.length) {
           console.log('123: ')
           // 判断是删除图片时同步el-upload数据
           this.syncElUpload(val)
@@ -160,7 +170,7 @@ export default {
     },
     // 控制达到最大限制时隐藏上传按钮
     isMaxHidden() {
-      return this.imgList.length >= this.limit
+      return this.videoList.length >= this.limit
     }
   },
 
@@ -184,10 +194,30 @@ export default {
 
   methods: {
     compressedImage,
+    // getVideoBase64(url) {
+    //   return new Promise(function(resolve, reject) {
+    //     let dataURL = ''
+    //     const video = document.createElement('video')
+    //     video.setAttribute('crossOrigin', 'anonymous')// 处理跨域
+    //     video.setAttribute('src', url)
+    //     video.setAttribute('width', 400)
+    //     video.setAttribute('height', 240)
+    //     video.addEventListener('loadeddata', function() {
+    //       const canvas = document.createElement('canvas')
+    //       const width = video.width // canvas的尺寸和图片一样
+    //       const height = video.height
+    //       canvas.width = width
+    //       canvas.height = height
+    //       canvas.getContext('2d').drawImage(video, 0, 0, width, height) // 绘制canvas
+    //       dataURL = canvas.toDataURL('image/jpeg') // 转换为base64
+    //       resolve(dataURL)
+    //     })
+    //   })
+    // },
     // 同步el-upload数据
     syncElUpload(val) {
-      const imgList = val || this.imgList
-      this.$refs.uploadRef.uploadFiles = imgList.map((v, i) => {
+      const videoList = val || this.videoList
+      this.$refs.uploadRef.uploadFiles = videoList.map((v, i) => {
         return {
           name: 'pic' + i,
           url: v,
@@ -197,11 +227,12 @@ export default {
       })
       this.isFirstMount = false
     },
-    // 上传图片之前
+    // 上传视频之前
     beforeUpload(file) {
       this.isFirstMount = false
       this.isUploading = true
       console.log('file: ', file)
+      this.fileName = file.name
       return true
       // if (this.useCompress) {
       //   // 图片压缩
@@ -226,13 +257,16 @@ export default {
       //   }
       // }
     },
-    // 上传完单张图片
+    // 上传完单个视频
     onSuccessUpload(res, file, fileList) {
       console.log('111: ', res)
       if (res.status === 200) {
-        if (this.imgList.length < this.limit) {
-          this.imgList.push(res.data)
-          this.successCallback(this.imgList)
+        if (this.videoList.length < this.limit) {
+          this.videoList.push({ url: res.data, title: this.fileName })
+          // this.getVideoBase64(res.data).then(res => {
+          //   console.log('url: ', res)
+          // })
+          this.successCallback(this.videoList)
         }
       } else {
         this.syncElUpload()
@@ -243,13 +277,13 @@ export default {
     // 移除单张图片
     onRemoveHandler(index) {
       console.log('index: ', index)
-      this.$confirm('确定删除该图片?', '提示', {
+      this.$confirm('确定删除该视频?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       })
         .then(() => {
-          this.imgList = this.imgList.filter((v, i) => {
+          this.videoList = this.videoList.filter((v, i) => {
             return i !== index
           })
           const images = this.$refs.uploadRef.uploadFiles.map(v => v.url)
@@ -263,7 +297,7 @@ export default {
       this.syncElUpload()
       this.$message({
         type: 'warning',
-        message: `图片超限，最多可上传${this.limit}张图片`
+        message: `视频超限，最多可上传${this.limit}个视频`
       })
     },
     onDragStart(e) {
@@ -271,15 +305,17 @@ export default {
     },
     onDragEnd(e) {
       e.target.classList.remove('hideShadow')
-      console.log('after sort: ', this.imgList)
+      console.log('after sort: ', this.videoList)
     },
     handlePreview(url) {
-      this.dialogImageUrl = url
+      // window.open(url, '_blank')
+      console.log('111')
+      this.videoUrl = url
       this.dialog = true
-      console.log('url: ', url)
+      // console.log('url: ', url)
     },
     modalClose() {
-      this.dialogImageUrl = ''
+      this.videoUrl = ''
     },
     trigger() {
       this.$refs.btn.click()
@@ -324,7 +360,11 @@ export default {
 .vue-draggable {
   display: flex;
   flex-wrap: wrap;
-
+  .draggable-items {
+    .file-name {
+      text-align: center;
+    }
+  }
   .draggable-item {
     margin-right: 5px;
     margin-bottom: 5px;
@@ -332,7 +372,21 @@ export default {
     border-radius: 6px;
     position: relative;
     overflow: hidden;
-
+    .play-icon {
+      z-index: 999;
+      position: absolute;
+      font-size: 35px;
+      color: #fff;
+      top: 50%;
+      left: 50%;
+      margin-top: -17px;
+      margin-left: -17px;
+      transition: all .5s;
+      cursor: pointer;
+      &:hover {
+        transform: scale(1.3);
+      }
+    }
     img {
       object-fit: cover;
     }

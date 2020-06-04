@@ -6,7 +6,8 @@
       :options="editorOption"
       @change="onEditorChange($event)"
     />
-    <image-upload ref="imgUploader" :remove-callback="uploadRemove" :visible="false" :success-callback="uploadSuccess" :headers="uploadHeader" :action="uploadAction" />
+    <image-upload ref="imgUploader" :visible="false" :success-callback="uploadSuccess" :headers="uploadHeader" :action="uploadAction" />
+    <video-upload ref="videoUploader" :visible="false" :success-callback="uploadVideoSuccess" :headers="uploadHeader" :action="uploadAction" />
     <!-- <image-upload
       v-if="uploadHeader"
       ref="uploader"
@@ -38,13 +39,16 @@ import 'quill/dist/quill.bubble.css'
 import { quillEditor } from 'vue-quill-editor'
 import Quill from 'quill'
 import ImageUpload from '@/components/ImageUpload'
+import VideoUpload from '@/components/VideoUpload'
 import ImageResize from 'quill-image-resize-module'
+import VideoResize from 'quill-video-resize-module'
 // import { host } from '@/utils/request'
 import { getTokenType, getToken } from '@/utils/auth'
 const SizeStyle = Quill.import('attributors/style/size')
 SizeStyle.whitelist = ['12px', '14px', '16px', '18px', '20px', '22px']
 Quill.register(SizeStyle, true)
 Quill.register('modules/imageResize', ImageResize)
+Quill.register('modules/videoResize', VideoResize)
 const BlockEmbed = Quill.import('blots/block/embed')
 class MyVideoBlot extends BlockEmbed {
   static create(value) {
@@ -69,7 +73,8 @@ export default {
   name: 'Editor',
   components: {
     quillEditor,
-    ImageUpload
+    ImageUpload,
+    VideoUpload
   },
   props: {
     value: {
@@ -91,7 +96,8 @@ export default {
             ['bold', 'italic', 'underline', 'strike'],
             ['image', 'video']
           ],
-          imageResize: true
+          imageResize: true,
+          videoResize: true
         }
       },
       uploadAction: '',
@@ -130,19 +136,18 @@ export default {
       this.$refs.editor.quill.insertEmbed(index, 'image', imgUrl, Quill.sources.USER)
       this.$refs.editor.quill.setSelection(index + 1, 0)
     },
-    uploadRemove(url) {
-
-    },
     configUpload() {
       this.uploadHeader = {
         Authorization: `${getTokenType()} ${getToken()}`
       }
       this.uploadAction = `http://10.0.0.11:8082/api/common/upload`
     },
-    uploadVideoSuccess({ response }) {
+    uploadVideoSuccess(data) {
+      console.log('data: ', data)
+      const videoUrl = data.length ? data[data.length - 1].url : ''
       const selection = this.$refs.editor.quill.getSelection()
       const index = selection != null ? selection.index : this.content.length
-      this.$refs.editor.quill.insertEmbed(index, 'myVideo', { url: response.data }, Quill.sources.USER)
+      this.$refs.editor.quill.insertEmbed(index, 'myVideo', { url: videoUrl }, Quill.sources.USER)
       this.$refs.editor.quill.setSelection(index + 1, 0)
     }
   }

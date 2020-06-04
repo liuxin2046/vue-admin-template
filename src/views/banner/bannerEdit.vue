@@ -10,9 +10,9 @@
       </el-form-item>
       <el-form-item label="视频上传" label-width="90px" prop="image">
         <el-col>
-          <image-upload v-model="form.image" :remove-callback="uploadRemove" :success-callback="uploadSuccess" :headers="upload.headers" :action="upload.action" />
-          <div class="tips">建议尺寸为750x1206px, 图片格式支持 jpg / png </div>
-          <el-button type="primary" @click="saveForm">保存视频</el-button>
+          <video-upload v-model="videos" :remove-callback="uploadRemove" :success-callback="uploadSuccess" :headers="upload.headers" :action="upload.action" />
+          <!-- <div class="tips">建议尺寸为750x1206px, 图片格式支持 jpg / png </div> -->
+          <el-button type="primary" @click="saveVideo">保存视频</el-button>
         </el-col>
       </el-form-item>
     </el-form>
@@ -23,6 +23,7 @@
 // import $api from '@/network/loginSet'
 import { getBanners } from '@/api/shop'
 import ImageUpload from '@/components/ImageUpload'
+import VideoUpload from '@/components/VideoUpload'
 // import { host } from '@/utils/request'
 // import user from '@/network/user'
 
@@ -31,7 +32,8 @@ import { getTokenType, getToken } from '@/utils/auth'
 // const ERR_OK = 200
 export default {
   components: {
-    ImageUpload
+    ImageUpload,
+    VideoUpload
   },
   data() {
     return {
@@ -44,6 +46,7 @@ export default {
         hide: true,
         image: []
       },
+      videos: [],
       upload: {
         // 测试action地址
         action: `http://10.0.0.11:8082/api/common/upload`,
@@ -103,6 +106,9 @@ export default {
     },
     saveForm() {
       console.log('form: ', this.form)
+    },
+    saveVideo() {
+      console.log('videos: ', this.videos)
     },
     cancelBtn() {
       this.$router.back()

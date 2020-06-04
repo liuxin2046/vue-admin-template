@@ -51,7 +51,7 @@ export const constantRoutes = [
       path: 'dashboard',
       name: 'Dashboard',
       component: () => import('@/views/dashboard/index'),
-      meta: { title: 'Dashboard', icon: 'dashboard' }
+      meta: { title: '主页', icon: 'dashboard' }
     }]
   },
   {
@@ -59,13 +59,13 @@ export const constantRoutes = [
     component: Layout,
     redirect: '/example/banner',
     name: 'Example',
-    meta: { title: 'Example', icon: 'example' },
+    meta: { title: '案例', icon: 'example' },
     children: [
       {
         path: 'banner',
         name: 'Banner',
         component: () => import('@/views/banner/bannerEdit'),
-        meta: { title: '图片上传', icon: 'table' }
+        meta: { title: '媒体上传', icon: 'table' }
       },
       {
         path: 'righText',
@@ -111,7 +111,7 @@ export const asyncRoutes = [
     path: '/menu1',
     component: Layout,
     name: 'Menu1',
-    meta: { title: '唱片管理', icon: 'nested' },
+    meta: { title: '唱片管理', icon: 'manage' },
     children: [
       {
         path: 'menu1-1',
@@ -135,7 +135,7 @@ export const asyncRoutes = [
         path: 'index',
         name: 'Form',
         component: () => import('@/views/nested/menu2/index'),
-        meta: { title: '数据分析', icon: 'nested', privileges: ['MANAGE_ANALYSIS'] }
+        meta: { title: '数据分析', icon: 'analysis', privileges: ['MANAGE_ANALYSIS'] }
       }
     ]
   },
@@ -147,7 +147,7 @@ export const asyncRoutes = [
         path: 'index',
         name: 'shopList',
         component: () => import('@/views/shop/shopList'),
-        meta: { title: '商品列表', icon: 'nested' }
+        meta: { title: '商品列表', icon: 'table' }
       }
     ]
   },
@@ -159,7 +159,7 @@ export const asyncRoutes = [
     name: 'seting',
     meta: {
       title: '系统设置',
-      icon: 'nested'
+      icon: 'seting'
     },
     children: [
       {
